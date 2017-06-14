@@ -8,6 +8,12 @@ use yii\db\Migration;
  */
 class m160711_062538_fias_tables extends Migration
 {
+    public function init()
+    {
+        $this->db = \solbianca\fias\Module::db();
+        parent::init();
+    }
+
     public function up()
     {
         $tableOptions = null;

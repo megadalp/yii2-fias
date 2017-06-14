@@ -10,6 +10,12 @@ use yii\db\Migration;
  */
 class m160714_090446_fsn_regions_codes extends Migration
 {
+    public function init()
+    {
+        $this->db = \solbianca\fias\Module::db();
+        parent::init();
+    }
+
     public function up()
     {
         $this->renameColumn('{{%fias_address_object}}', 'region', 'region_code');
@@ -96,8 +102,8 @@ class m160714_090446_fsn_regions_codes extends Migration
             '74' => 'Челябинская область',
             '75' => 'Читинская область',
             '76' => 'Ярославская область',
-            '77' => 'Г. Москва',
-            '78' => 'Г. Санкт-Петербург',
+            '77' => 'Москва',
+            '78' => 'Санкт-Петербург',
             '79' => 'Еврейская автономная область',
             '80' => 'Агинский Бурятский автономный округ',
             '81' => 'Коми-Пермяцкий автономный округ',
@@ -109,6 +115,8 @@ class m160714_090446_fsn_regions_codes extends Migration
             '87' => 'Чукотский автономный округ',
             '88' => 'Эвенкийский автономный округ',
             '89' => 'Ямало-Ненецкий автономный округ',
+            '92' => 'Республика Крым',
+            '92' => 'Севастополь',
         ];
 
         foreach ($regions as $code => $title) {

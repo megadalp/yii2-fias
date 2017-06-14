@@ -32,7 +32,7 @@ class ImportModel extends BaseModel
     public function import()
     {
         try {
-            Yii::$app->getDb()->createCommand('SET foreign_key_checks = 0;')->execute();
+            \solbianca\fias\Module::db()->createCommand('SET foreign_key_checks = 0;')->execute();
 
             $this->dropIndexes();
 
@@ -46,7 +46,7 @@ class ImportModel extends BaseModel
 
             $this->saveLog();
 
-            Yii::$app->getDb()->createCommand('SET foreign_key_checks = 1;')->execute();
+            \solbianca\fias\Module::db()->createCommand('SET foreign_key_checks = 1;')->execute();
         } catch (\Exception $e) {
             throw $e;
         }
@@ -115,24 +115,24 @@ class ImportModel extends BaseModel
         Console::output('Сбрасываем индексы и ключи.');
 
         Console::output('Сбрасываем внешние ключи.');
-        Yii::$app->getDb()->createCommand()->dropForeignKey('houses_parent_id_fkey', '{{%fias_house}}')->execute();
-        Yii::$app->getDb()->createCommand()->dropForeignKey('address_object_parent_id_fkey',
+        \solbianca\fias\Module::db()->createCommand()->dropForeignKey('houses_parent_id_fkey', '{{%fias_house}}')->execute();
+        \solbianca\fias\Module::db()->createCommand()->dropForeignKey('address_object_parent_id_fkey',
             '{{%fias_address_object}}')->execute();
-        Yii::$app->getDb()->createCommand()->dropForeignKey('fk_region_code_ref_fias_region',
+        \solbianca\fias\Module::db()->createCommand()->dropForeignKey('fk_region_code_ref_fias_region',
             '{{%fias_address_object}}')->execute();
 
         Console::output('Сбрасываем индексы.');
-        Yii::$app->getDb()->createCommand()->dropIndex('region_code', '{{%fias_address_object}}')->execute();
-        Yii::$app->getDb()->createCommand()->dropIndex('house_address_id_fkey_idx', '{{%fias_house}}')->execute();
-        Yii::$app->getDb()->createCommand()->dropIndex('address_object_parent_id_fkey_idx',
+        \solbianca\fias\Module::db()->createCommand()->dropIndex('region_code', '{{%fias_address_object}}')->execute();
+        \solbianca\fias\Module::db()->createCommand()->dropIndex('house_address_id_fkey_idx', '{{%fias_house}}')->execute();
+        \solbianca\fias\Module::db()->createCommand()->dropIndex('address_object_parent_id_fkey_idx',
             '{{%fias_address_object}}')->execute();
-        Yii::$app->getDb()->createCommand()->dropIndex('address_object_title_lower_idx',
+        \solbianca\fias\Module::db()->createCommand()->dropIndex('address_object_title_lower_idx',
             '{{%fias_address_object}}')->execute();
 
         Console::output('Сбрасываем основные ключи.');
-        Yii::$app->getDb()->createCommand()->dropPrimaryKey('pk', '{{%fias_house}}')->execute();
-        Yii::$app->getDb()->createCommand()->dropPrimaryKey('pk', '{{%fias_address_object}}')->execute();
-        Yii::$app->getDb()->createCommand()->dropPrimaryKey('pk', '{{%fias_address_object_level}}')->execute();
+        \solbianca\fias\Module::db()->createCommand()->dropPrimaryKey('pk', '{{%fias_house}}')->execute();
+        \solbianca\fias\Module::db()->createCommand()->dropPrimaryKey('pk', '{{%fias_address_object}}')->execute();
+        \solbianca\fias\Module::db()->createCommand()->dropPrimaryKey('pk', '{{%fias_address_object_level}}')->execute();
     }
 
     /**
@@ -143,30 +143,30 @@ class ImportModel extends BaseModel
         Console::output('Добавляем к данным индексы и ключи.');
 
         Console::output('Создаем основные ключи.');
-        Yii::$app->getDb()->createCommand()->addPrimaryKey('pk', '{{%fias_house}}', 'id')->execute();
-        Yii::$app->getDb()->createCommand()->addPrimaryKey('pk', '{{%fias_address_object}}', 'id')->execute();
-        Yii::$app->getDb()->createCommand()->addPrimaryKey('pk', '{{%fias_address_object_level}}',
+        \solbianca\fias\Module::db()->createCommand()->addPrimaryKey('pk', '{{%fias_house}}', 'id')->execute();
+        \solbianca\fias\Module::db()->createCommand()->addPrimaryKey('pk', '{{%fias_address_object}}', 'id')->execute();
+        \solbianca\fias\Module::db()->createCommand()->addPrimaryKey('pk', '{{%fias_address_object_level}}',
             ['title', 'code'])->execute();
 
         Console::output('Добавляем индексы.');
-        Yii::$app->getDb()->createCommand()->createIndex('region_code', '{{%fias_address_object}}',
+        \solbianca\fias\Module::db()->createCommand()->createIndex('region_code', '{{%fias_address_object}}',
             'region_code')->execute();
-        Yii::$app->getDb()->createCommand()->createIndex('house_address_id_fkey_idx', '{{%fias_house}}',
+        \solbianca\fias\Module::db()->createCommand()->createIndex('house_address_id_fkey_idx', '{{%fias_house}}',
             'address_id')->execute();
-        Yii::$app->getDb()->createCommand()->createIndex('address_object_parent_id_fkey_idx',
+        \solbianca\fias\Module::db()->createCommand()->createIndex('address_object_parent_id_fkey_idx',
             '{{%fias_address_object}}',
             'parent_id')->execute();
-        Yii::$app->getDb()->createCommand()->createIndex('address_object_title_lower_idx', '{{%fias_address_object}}',
+        \solbianca\fias\Module::db()->createCommand()->createIndex('address_object_title_lower_idx', '{{%fias_address_object}}',
             'title')->execute();
 
         Console::output('Добавляем внешние ключи');
-        Yii::$app->getDb()->createCommand()->addForeignKey('houses_parent_id_fkey', '{{%fias_house}}', 'address_id',
+        \solbianca\fias\Module::db()->createCommand()->addForeignKey('houses_parent_id_fkey', '{{%fias_house}}', 'address_id',
             '{{%fias_address_object}}',
             'address_id', 'CASCADE', 'CASCADE')->execute();
-        Yii::$app->getDb()->createCommand()->addForeignKey('address_object_parent_id_fkey', '{{%fias_address_object}}',
+        \solbianca\fias\Module::db()->createCommand()->addForeignKey('address_object_parent_id_fkey', '{{%fias_address_object}}',
             'parent_id',
             '{{%fias_address_object}}', 'address_id', 'CASCADE', 'CASCADE')->execute();
-        Yii::$app->getDb()->createCommand()->addForeignKey('fk_region_code_ref_fias_region', '{{%fias_address_object}}',
+        \solbianca\fias\Module::db()->createCommand()->addForeignKey('fk_region_code_ref_fias_region', '{{%fias_address_object}}',
             'region_code',
             '{{%fias_region}}', 'code', 'NO ACTION', 'NO ACTION')->execute();
     }

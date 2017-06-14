@@ -52,7 +52,7 @@ trait ImportModelTrait
             if ($rows) {
                 $rows = implode("\n", $rows);
                 static::saveInFile($pathToFile, $rows);
-                $count += static::getDb()
+                $count += \solbianca\fias\Module::db()
                     ->createCommand("LOAD DATA LOCAL INFILE '{$pathToFile}' INTO TABLE {$tableName} ({$values})")
                     ->execute();
                 Console::output("Inserted {$count} rows");

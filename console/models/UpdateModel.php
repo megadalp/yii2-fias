@@ -64,10 +64,10 @@ class UpdateModel extends BaseModel
 
         $this->deleteFiasData();
 
-        $transaction = Yii::$app->getDb()->beginTransaction();
+        $transaction = \solbianca\fias\Module::db()->beginTransaction();
 
         try {
-            Yii::$app->getDb()->createCommand('SET foreign_key_checks = 0;')->execute();
+            \solbianca\fias\Module::db()->createCommand('SET foreign_key_checks = 0;')->execute();
 
             $this->updateAddressObject();
 
@@ -75,7 +75,7 @@ class UpdateModel extends BaseModel
 
             $this->saveLog();
 
-            Yii::$app->getDb()->createCommand('SET foreign_key_checks = 1;')->execute();
+            \solbianca\fias\Module::db()->createCommand('SET foreign_key_checks = 1;')->execute();
             $transaction->commit();
         } catch (\Exception $e) {
             $transaction->rollBack();

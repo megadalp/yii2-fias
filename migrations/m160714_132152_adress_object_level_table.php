@@ -8,16 +8,22 @@ use yii\db\Migration;
  */
 class m160714_132152_adress_object_level_table extends Migration
 {
+    public function init()
+    {
+        $this->db = \solbianca\fias\Module::db();
+        parent::init();
+    }
+
     public function up()
     {
-        Yii::$app->getDb()->createCommand('SET foreign_key_checks = 0;')->execute();
+        \solbianca\fias\Module::db()->createCommand('SET foreign_key_checks = 0;')->execute();
 
         $this->addColumn('{{%fias_address_object_level}}', 'level',
             $this->integer()->comment('Уровень адресного объекта'));
         $this->addColumn('{{%fias_address_object_level}}', 'short_title',
             $this->string()->comment('Короткое обозначение')->after('title'));
 
-        Yii::$app->getDb()->createCommand('SET foreign_key_checks = 1;')->execute();
+        \solbianca\fias\Module::db()->createCommand('SET foreign_key_checks = 1;')->execute();
     }
 
     public function down()
