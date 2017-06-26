@@ -14,6 +14,14 @@ use Yii;
 class FiasUpdateLog extends \yii\db\ActiveRecord
 {
     /**
+     * @return mixed|\yii\db\Connection
+     */
+    public static function getDb()
+    {
+        return \solbianca\fias\Module::db();
+    }
+
+    /**
      * @inheritdoc
      */
     public static function tableName()

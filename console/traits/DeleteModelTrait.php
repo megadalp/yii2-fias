@@ -3,6 +3,7 @@
 
 namespace solbianca\fias\console\traits;
 
+use Yii;
 use yii\base\InvalidConfigException;
 use yii\db\ActiveRecord;
 use yii\helpers\Console;
@@ -23,7 +24,7 @@ trait DeleteModelTrait
         $count = 0;
         while ($rows = $reader->getRows()) {
             $count += static::removeRows($rows);
-            Console::output("Deleted {$count} rows");
+            Console::output(Yii::$app->formatter->asDateTime(time(), 'php:Y-m-d H:i:s').' '.  "Deleted {$count} rows");
         }
     }
 

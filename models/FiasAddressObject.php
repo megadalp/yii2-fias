@@ -47,11 +47,19 @@ class FiasAddressObject extends ActiveRecord implements FiasModelInterface
     use DeleteModelTrait;
 
     /**
+     * @return mixed|\yii\db\Connection
+     */
+    public static function getDb()
+    {
+        return \solbianca\fias\Module::db();
+    }
+
+    /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return '{{%fias_address_object}}';
+        return 'fias_address_object';
     }
 
     /**

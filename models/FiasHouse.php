@@ -33,6 +33,14 @@ class FiasHouse extends ActiveRecord implements FiasModelInterface
     use DeleteModelTrait;
 
     /**
+     * @return mixed|\yii\db\Connection
+     */
+    public static function getDb()
+    {
+        return \solbianca\fias\Module::db();
+    }
+
+    /**
      * @inheritdoc
      */
     public static function tableName()

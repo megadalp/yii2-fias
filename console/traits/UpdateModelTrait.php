@@ -3,10 +3,12 @@
 
 namespace solbianca\fias\console\traits;
 
+use Yii;
 use yii\db\ActiveRecord;
+use yii\helpers\Console;
+use solbianca\fias\Module as Fias;
 use solbianca\fias\console\base\XmlReader;
 use solbianca\fias\models\FiasModelInterface;
-use yii\helpers\Console;
 
 /**
  * @mixin ActiveRecord
@@ -32,9 +34,9 @@ trait UpdateModelTrait
         $tTableName = static::temporaryTableName();
         $tableName = static::tableName();
 
-        \solbianca\fias\Module::db()->createCommand("DROP TABLE IF EXISTS {$tTableName};")->execute();
-        \solbianca\fias\Module::db()->createCommand("CREATE TABLE {$tTableName} SELECT * FROM {$tableName} LIMIT 0;")->execute();
-        \solbianca\fias\Module::db()->createCommand()->addColumn($tTableName, 'previous_id', 'char(36)')->execute();
+        Fias::db()->createCommand("DROP TABLE IF EXISTS {$tTableName};")->execute();
+        Fias::db()->createCommand("CREATE TABLE {$tTableName} SELECT * FROM {$tableName} LIMIT 0;")->execute();
+        Fias::db()->createCommand()->addColumn($tTableName, 'previous_id', 'char(36)')->execute();
 
         $count = 0;
 
@@ -44,19 +46,21 @@ trait UpdateModelTrait
                 $rows[] = array_values($row);
             }
             if ($rows) {
-                $count += \solbianca\fias\Module::db()->createCommand()->batchInsert($tTableName, array_values($attributes),
+                $count += Fias::db()->createCommand()->batchInsert($tTableName, array_values($attributes),
                     $rows)->execute();
-                Console::output("Inserted {$count} rows in tmp table.");
+                Console::output(Yii::$app->formatter->asDateTime(time(), 'php:Y-m-d H:i:s').' '.  "Inserted {$count} rows into tmp table.");
             }
         }
 
-        $count = \solbianca\fias\Module::db()->createCommand("DELETE old FROM {$tableName} old INNER JOIN {$tTableName} tmp
-          ON (old.id = tmp.previous_id OR old.id = tmp.id)")->execute();
-        Console::output("Удалено старых записей: {$count}");
+        Console::output(Yii::$app->formatter->asDateTime(time(), 'php:Y-m-d H:i:s').' '.  "{$tableName}: Удаление устаревших записей ...");
+        $count = Fias::db()->createCommand("DELETE old FROM {$tableName} AS old INNER JOIN {$tTableName} AS tmp
+          ON (old.id = tmp.previous_id OR old.address_id = tmp.address_id OR old.id = tmp.id)")->execute();
+        Console::output(Yii::$app->formatter->asDateTime(time(), 'php:Y-m-d H:i:s').' '.  "Удалено: {$count}");
 
-        \solbianca\fias\Module::db()->createCommand()->dropColumn($tTableName, 'previous_id')->execute();
-        $count = \solbianca\fias\Module::db()->createCommand("INSERT INTO {$tableName} SELECT tmp.* FROM {$tTableName} tmp")->execute();
-        Console::output("Добавлено новых записей: {$count}");
+        Console::output(Yii::$app->formatter->asDateTime(time(), 'php:Y-m-d H:i:s').' '.  "{$tableName}: Добавление измененных/новых записей ...");
+        Fias::db()->createCommand()->dropColumn($tTableName, 'previous_id')->execute();
+        $count = Fias::db()->createCommand("INSERT INTO {$tableName} SELECT tmp.* FROM {$tTableName} AS tmp")->execute();
+        Console::output(Yii::$app->formatter->asDateTime(time(), 'php:Y-m-d H:i:s').' '.  "Добавлено: {$count}");
     }
 
     /**
@@ -65,6 +69,7 @@ trait UpdateModelTrait
     public static function updateCallback()
     {
         $tTableName = static::temporaryTableName();
-        \solbianca\fias\Module::db()->createCommand()->dropTable($tTableName);
+        // подчищаем за собой
+        Fias::db()->createCommand("DROP TABLE IF EXISTS {$tTableName}")->execute();
     }
 }

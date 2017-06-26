@@ -28,7 +28,9 @@ class m160714_132152_adress_object_level_table extends Migration
 
     public function down()
     {
+        $this->execute( 'SET FOREIGN_KEY_CHECKS = 0' );
         $this->dropColumn('{{%fias_address_object_level}}', 'level');
         $this->dropColumn('{{%fias_address_object_level}}', 'short_title');
+        $this->execute( 'SET FOREIGN_KEY_CHECKS = 1' );
     }
 }

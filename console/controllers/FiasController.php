@@ -49,7 +49,7 @@ class FiasController extends Controller
     {
         $directory = Yii::$app->getModule('fias')->directory;
         FileHelper::clearDirectory($directory);
-        Console::output("Очистка директории '{$directory}' завершена.");
+        Console::output(Yii::$app->formatter->asDateTime(time(), 'php:Y-m-d H:i:s').' '.  "Очистка директории '{$directory}' завершена.");
     }
 
     /**

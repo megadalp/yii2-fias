@@ -7,8 +7,9 @@
 namespace solbianca\fias\console\models;
 
 use Yii;
-use solbianca\fias\console\base\XmlReader;
 use yii\helpers\Console;
+use solbianca\fias\console\base\XmlReader;
+use solbianca\fias\Module as Fias;
 use solbianca\fias\models\FiasUpdateLog;
 use solbianca\fias\models\FiasHouse;
 use solbianca\fias\models\FiasAddressObject;
@@ -28,6 +29,7 @@ class UpdateModel extends BaseModel
         if (null !== $file) {
             $directory = $loader->wrapDirectory(Yii::getAlias($file));
         } else {
+            Console::output(Yii::$app->formatter->asDateTime(time(), 'php:Y-m-d H:i:s').' '.  "Загрузка последнего обновления (delta_file) БД ФИАС");
             $directory = $loader->loadUpdateFile($fileInfo);
         }
 
@@ -51,45 +53,59 @@ class UpdateModel extends BaseModel
         $currentVersion = FiasUpdateLog::find()->orderBy('id desc')->limit(1)->one();
 
         if (!$currentVersion) {
-            Console::output('База не инициализированна, выполните копанду: php yii fias/install');
+            Console::output(Yii::$app->formatter->asDateTime(time(), 'php:Y-m-d H:i:s').' '.  'База не инициализирована, выполните команду: php yii fias/install');
             return;
         }
 
-        if (false === $this->loader->isUpdateRequired($currentVersion->version_id)) {
-            Console::output('База в актуальном состоянии');
+        //if (false === $this->loader->isUpdateRequired($currentVersion->version_id)) {
+        /** Запрашиваем список данных обо всех обновлениях, выпущенных после той версии, что у нас */
+        $updates = $this->loader->getAllFilesInfo($currentVersion->version_id);
+        if (empty($updates)) {
+            Console::output(Yii::$app->formatter->asDateTime(time(), 'php:Y-m-d H:i:s').' '.  'База в актуальном состоянии');
             return;
         }
 
-        Console::output("Вы хотите выполнить обновление с версии {$currentVersion->version_id} на {$this->fileInfo->getVersionId()}");
+        /** идем по всем полученным обновлениям, применяем */
+        foreach ($updates as $update) {
+            $this->fileInfo = $update;
+            $this->directory = $this->getDirectory($this->file, $this->loader, $this->fileInfo);
+            $this->versionId = $this->getVersion($this->directory);
 
-        $this->deleteFiasData();
+            Console::output(Yii::$app->formatter->asDateTime(time(), 'php:Y-m-d H:i:s').' '.  "Обновление с версии {$currentVersion->version_id} до {$this->fileInfo->getVersionId()}");
+            $this->deleteFiasData();
 
-        $transaction = \solbianca\fias\Module::db()->beginTransaction();
+            $transaction = Fias::db()->beginTransaction();
 
-        try {
-            \solbianca\fias\Module::db()->createCommand('SET foreign_key_checks = 0;')->execute();
+            try {
+                Fias::db()->createCommand('SET foreign_key_checks = 0;')->execute();
 
-            $this->updateAddressObject();
+                $this->updateAddressObject();
 
-            $this->updateHouse();
+/** выпиливание номеров домов */
+// таблица 50 млн записей, часами обновляется. Когда уже наверняка понадобится, тогда и включу
+//                $this->updateHouse();
 
-            $this->saveLog();
+                $this->saveLog();
 
-            \solbianca\fias\Module::db()->createCommand('SET foreign_key_checks = 1;')->execute();
-            $transaction->commit();
-        } catch (\Exception $e) {
-            $transaction->rollBack();
-            throw $e;
+                Fias::db()->createCommand('SET foreign_key_checks = 1;')->execute();
+                $transaction->commit();
+                // меняем текущую версию для отображения
+                $currentVersion->version_id = $this->fileInfo->getVersionId();
+            } catch (\Exception $e) {
+                $transaction->rollBack();
+                throw $e;
+            }
         }
     }
 
+    /** в обновлении могут присутствовать списки удаляемых записей */
     private function deleteFiasData()
     {
-        Console::output('Удаление данных.');
+        Console::output(Yii::$app->formatter->asDateTime(time(), 'php:Y-m-d H:i:s').' '.  'Удаление данных.');
 
         $deletedHouseFile = $this->directory->getDeletedHouseFile();
         if ($deletedHouseFile) {
-            Console::output("Удаление записей из таблицы " . FiasHouse::tableName() . ".");
+            Console::output(Yii::$app->formatter->asDateTime(time(), 'php:Y-m-d H:i:s').' '.  "Удаление записей из таблицы " . FiasHouse::tableName() . ".");
             FiasHouse::remove(new XmlReader(
                 $deletedHouseFile,
                 FiasHouse::XML_OBJECT_KEY,
@@ -100,7 +116,7 @@ class UpdateModel extends BaseModel
 
         $deletedAddressObjectsFile = $this->directory->getDeletedAddressObjectFile();
         if ($deletedAddressObjectsFile) {
-            Console::output("Удаление записей из таблицы " . FiasAddressObject::tableName() . ".");
+            Console::output(Yii::$app->formatter->asDateTime(time(), 'php:Y-m-d H:i:s').' '.  "Удаление записей из таблицы " . FiasAddressObject::tableName() . ".");
             FiasAddressObject::remove(new XmlReader(
                 $deletedAddressObjectsFile,
                 FiasAddressObject::XML_OBJECT_KEY,
@@ -112,7 +128,7 @@ class UpdateModel extends BaseModel
 
     private function updateAddressObject()
     {
-        Console::output('Обновление адресов обектов');
+        Console::output(Yii::$app->formatter->asDateTime(time(), 'php:Y-m-d H:i:s').' '.  'Обновление адресов объектов');
 
         $attributes = FiasAddressObject::getXmlAttributes();
         $attributes['PREVID'] = 'previous_id';
@@ -127,7 +143,7 @@ class UpdateModel extends BaseModel
 
     private function updateHouse()
     {
-        Console::output('Обновление домов');
+        Console::output(Yii::$app->formatter->asDateTime(time(), 'php:Y-m-d H:i:s').' '.  'Обновление домов');
 
         $attributes = FiasHouse::getXmlAttributes();
         $attributes['PREVID'] = 'previous_id';

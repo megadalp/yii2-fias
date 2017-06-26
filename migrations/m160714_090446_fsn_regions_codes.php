@@ -129,11 +129,13 @@ class m160714_090446_fsn_regions_codes extends Migration
 
     public function down()
     {
+        $this->execute( 'SET FOREIGN_KEY_CHECKS = 0' );
         $this->dropForeignKey('fk_region_code_ref_fias_region', '{{%fias_address_object}}');
         $this->dropIndex('region_code', '{{%fias_address_object}}');
 
         $this->renameColumn('{{%fias_address_object}}', 'region_code', 'region');
         $this->renameColumn('{{%fias_region}}', 'code', 'id');
         $this->delete('{{%fias_region}}');
+        $this->execute( 'SET FOREIGN_KEY_CHECKS = 1' );
     }
 }

@@ -27,6 +27,7 @@ class Module extends \yii\base\Module
      * @var string
      */
     private $directory;
+    private static $directoryStatic;
 
     /**
      * @inherit
@@ -34,8 +35,9 @@ class Module extends \yii\base\Module
     public function init()
     {
         parent::init();
-
-        $this->directory = Yii::getAlias('@app/runtime/fias');
+        if (!isset($this->directory)) {
+            $this->directory = Yii::getAlias('@app/runtime/fias');
+        }
     }
 
     /**
@@ -43,6 +45,9 @@ class Module extends \yii\base\Module
      */
     public function getDirectory()
     {
+        if (!isset($this->directory)) {
+            $this->directory = Yii::getAlias('@app/runtime/fias');
+        }
         return $this->directory;
     }
 
@@ -52,6 +57,7 @@ class Module extends \yii\base\Module
     public function setDirectory($value)
     {
         $this->directory = $value;
+        self::$directoryStatic = $this->directory;
     }
 
     /**
@@ -94,5 +100,21 @@ class Module extends \yii\base\Module
         }
 
         return self::$dbStatic;
+    }
+    /**
+     * Для статических методов
+     * @return string
+     */
+    public static function directory()
+    {
+        if (empty(self::$directoryStatic)) {
+            if (!empty(Yii::$app->getModule('fias')->directory)) {
+                self::$directoryStatic = Yii::$app->getModule('fias')->directory;
+            } else {
+                self::$directoryStatic = Yii::getAlias('@app/runtime/fias');
+            }
+        }
+
+        return self::$directoryStatic;
     }
 }
