@@ -63,12 +63,14 @@ class ImportModel extends BaseModel
     private function importAddressObject()
     {
         Console::output(Yii::$app->formatter->asDateTime(time(), 'php:Y-m-d H:i:s').' '.  'Импорт адресов объектов');
-        FiasAddressObject::import(new XmlReader(
-            $this->directory->getAddressObjectFile(),
-            FiasAddressObject::XML_OBJECT_KEY,
-            array_keys(FiasAddressObject::getXmlAttributes()),
-            FiasAddressObject::getXmlFilters()
-        ));
+        FiasAddressObject::import(
+            new XmlReader(
+                $this->directory->getAddressObjectFile(),
+                FiasAddressObject::XML_OBJECT_KEY,
+                array_keys(FiasAddressObject::getXmlAttributes()),
+                FiasAddressObject::getXmlFilters()
+            )
+        );
     }
 
     /**
@@ -113,7 +115,7 @@ class ImportModel extends BaseModel
     }
 
     /**
-     * Сбрсываем индексыдля табоиц даееых фиас
+     * Сбрасываем индексы для ускорения заливки данных
      */
     protected function dropIndexes()
     {
@@ -121,13 +123,12 @@ class ImportModel extends BaseModel
 
         Console::output(Yii::$app->formatter->asDateTime(time(), 'php:Y-m-d H:i:s').' '.  'Сбрасываем внешние ключи.');
 
-/** выпиливание номеров домов */
-//Fias::db()->createCommand()->dropForeignKey('houses_parent_id_fkey', '{{%fias_house}}')->execute();
-
         Fias::db()->createCommand()->dropForeignKey('address_object_parent_id_fkey',
             '{{%fias_address_object}}')->execute();
         Fias::db()->createCommand()->dropForeignKey('fk_region_code_ref_fias_region',
             '{{%fias_address_object}}')->execute();
+/** выпиливание номеров домов */
+//Fias::db()->createCommand()->dropForeignKey('houses_parent_id_fkey', '{{%fias_house}}')->execute();
 
         Console::output(Yii::$app->formatter->asDateTime(time(), 'php:Y-m-d H:i:s').' '.  'Сбрасываем индексы.');
         Fias::db()->createCommand()->dropIndex('region_code', '{{%fias_address_object}}')->execute();
@@ -135,21 +136,19 @@ class ImportModel extends BaseModel
             '{{%fias_address_object}}')->execute();
         Fias::db()->createCommand()->dropIndex('address_object_title_lower_idx',
             '{{%fias_address_object}}')->execute();
-
 /** выпиливание номеров домов */
 //Fias::db()->createCommand()->dropIndex('house_address_id_fkey_idx', '{{%fias_house}}')->execute();
 
         Console::output(Yii::$app->formatter->asDateTime(time(), 'php:Y-m-d H:i:s').' '.  'Сбрасываем основные ключи.');
-        Fias::db()->createCommand()->dropPrimaryKey('pk', '{{%fias_house}}')->execute();
+        Fias::db()->createCommand()->dropPrimaryKey('pk', '{{%fias_address_object}}')->execute();
         Fias::db()->createCommand()->dropPrimaryKey('pk', '{{%fias_address_object_level}}')->execute();
-
 /** выпиливание номеров домов */
-//Fias::db()->createCommand()->dropPrimaryKey('pk', '{{%fias_address_object}}')->execute();
+//Fias::db()->createCommand()->dropPrimaryKey('pk', '{{%fias_house}}')->execute();
 
     }
 
     /**
-     * Устанавливаем индексы для таблиц данных фиас
+     * Восстанавливаем индексы
      */
     protected function addIndexes()
     {
@@ -177,9 +176,7 @@ class ImportModel extends BaseModel
         Console::output(Yii::$app->formatter->asDateTime(time(), 'php:Y-m-d H:i:s').' '.  'Добавляем внешние ключи');
 
 /** выпиливание номеров домов */
-//Fias::db()->createCommand()->addForeignKey('houses_parent_id_fkey', '{{%fias_house}}', 'address_id',
-//    '{{%fias_address_object}}',
-//    'address_id', 'CASCADE', 'CASCADE')->execute();
+//Fias::db()->createCommand()->addForeignKey('houses_parent_id_fkey', '{{%fias_house}}', 'address_id', '{{%fias_address_object}}', 'address_id', 'CASCADE', 'CASCADE')->execute();
 
         Fias::db()->createCommand()->addForeignKey('address_object_parent_id_fkey', '{{%fias_address_object}}',
             'parent_id',

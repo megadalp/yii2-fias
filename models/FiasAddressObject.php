@@ -32,6 +32,7 @@ use solbianca\fias\console\traits\ImportModelTrait;
  * @property string $oktmo
  * @property string $ifnsul
  * @property string $ifnsfl
+ * @property integer $cent_status
  *
  * @property FiasAddressObjectLevel $addressLevel
  * @property FiasAddressObject $parent
@@ -98,6 +99,7 @@ class FiasAddressObject extends ActiveRecord implements FiasModelInterface
             'OKTMO' => 'oktmo',
             'IFNSUL' => 'ifnsul',
             'IFNSFL' => 'ifnsfl',
+            'CENTSTATUS' => 'cent_status',
         ];
     }
 
@@ -116,7 +118,7 @@ class FiasAddressObject extends ActiveRecord implements FiasModelInterface
     {
         return [
             [['id', 'parent_id'], 'required'],
-            [['address_level', 'postal_code'], 'integer'],
+            [['address_level', 'postal_code', 'cent_status'], 'integer'],
             [['id', 'address_id', 'parent_id'], 'string', 'max' => 36],
             [
                 [
