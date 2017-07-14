@@ -10,29 +10,27 @@ use solbianca\fias\console\traits\ImportModelTrait;
 /**
  * This is the model class for table "{{%fias_address_object}}".
  *
- * @property string $id
  * @property string $address_id
- * @property string $parent_id
  * @property integer $address_level
- * @property string $title
- * @property integer $postal_code
- * @property string $region_code
- * @property string $prefix
- * @property string $area_code
- * @property string $city_code
- * @property string $auto_code
- * @property string $ctar_code
- * @property string $place_code
- * @property string $street_code
- * @property string $extr_code
- * @property string $sext_code
- * @property string $plain_code
- * @property string $code
- * @property string $okato
- * @property string $oktmo
- * @property string $ifnsul
- * @property string $ifnsfl
  * @property integer $cent_status
+ * @property string $prefix
+ * @property string $title
+ * <Классификационные коды>
+ *     @property string $region_code
+ *     @property string $auto_code
+ *     @property string $area_code
+ *     @property string $city_code
+ *     @property string $ctar_code
+ *     @property string $place_code
+ *     @property string $street_code
+ *     @property string $extr_code
+ *     @property string $sext_code
+ *     @property integer $postal_code
+ * </Классификационные коды>
+ * @property string $parent_id
+ * @property string $plain_code
+ * @property string $off_name
+ * @property string $id
  *
  * @property FiasAddressObjectLevel $addressLevel
  * @property FiasAddressObject $parent
@@ -77,29 +75,29 @@ class FiasAddressObject extends ActiveRecord implements FiasModelInterface
     public static function getXmlAttributes()
     {
         return [
-            'AOID' => 'id',
-            'AOGUID' => 'address_id',
-            'AOLEVEL' => 'address_level',
-            'PARENTGUID' => 'parent_id',
-            'FORMALNAME' => 'title',
-            'POSTALCODE' => 'postal_code',
-            'SHORTNAME' => 'prefix',
-            'REGIONCODE' => 'region_code',
-            'AREACODE' => 'area_code',
-            'AUTOCODE' => 'auto_code',
-            'CITYCODE' => 'city_code',
-            'CTARCODE' => 'ctar_code',
-            'PLACECODE' => 'place_code',
-            'STREETCODE' => 'street_code',
-            'EXTRCODE' => 'extr_code',
-            'SEXTCODE' => 'sext_code',
-            'PLAINCODE' => 'plain_code',
-            'CODE' => 'code',
-            'OKATO' => 'okato',
-            'OKTMO' => 'oktmo',
-            'IFNSUL' => 'ifnsul',
-            'IFNSFL' => 'ifnsfl',
+            'AOGUID'     => 'address_id',
+            'AOLEVEL'    => 'address_level',
             'CENTSTATUS' => 'cent_status',
+            'SHORTNAME'  => 'prefix',
+            'FORMALNAME' => 'title',
+            // <Классификационные коды>
+            'REGIONCODE' => 'region_code',
+            'AREACODE'   => 'area_code',
+            'AUTOCODE'   => 'auto_code',
+            'CITYCODE'   => 'city_code',
+            'CTARCODE'   => 'ctar_code',
+            'PLACECODE'  => 'place_code',
+            'STREETCODE' => 'street_code',
+            'EXTRCODE'   => 'extr_code',
+            'SEXTCODE'   => 'sext_code',
+            // </Классификационные коды>
+            'POSTALCODE' => 'postal_code',
+            'PARENTGUID' => 'parent_id',
+            // остальные нужны для очень редких специфических надобностей
+            'OFFNAME'    => 'off_name',
+            'PLAINCODE'  => 'plain_code',
+            // "По этому коду отслеживается вся история изменений по адресному объекту." Зачем он здесь-то нужен? Нам aoguid нужен.
+            'AOID'       => 'id',
         ];
     }
 
@@ -108,7 +106,9 @@ class FiasAddressObject extends ActiveRecord implements FiasModelInterface
      */
     public static function getXmlFilters()
     {
-        return [['field' => 'ACTSTATUS', 'type' => 'eq', 'value' => 1]];
+        return [
+            ['field' => 'ACTSTATUS', 'type' => 'eq', 'value' => 1],
+        ];
     }
 
     /**
@@ -117,9 +117,9 @@ class FiasAddressObject extends ActiveRecord implements FiasModelInterface
     public function rules()
     {
         return [
-            [['id', 'parent_id'], 'required'],
+            [['address_id', 'id', 'parent_id'], 'required'],
             [['address_level', 'postal_code', 'cent_status'], 'integer'],
-            [['id', 'address_id', 'parent_id'], 'string', 'max' => 36],
+            [['address_id', 'id', 'parent_id'], 'string', 'max' => 36],
             [
                 [
                     'title',
@@ -134,11 +134,7 @@ class FiasAddressObject extends ActiveRecord implements FiasModelInterface
                     'extr_code',
                     'sext_code',
                     'plain_code',
-                    'code',
-                    'okato',
-                    'oktmo',
-                    'ifnsul',
-                    'ifnsfl',
+                    'off_name',
                 ],
                 'string',
                 'max' => 255
@@ -175,6 +171,8 @@ class FiasAddressObject extends ActiveRecord implements FiasModelInterface
             'postal_code' => 'Postal Code',
             'region_code' => 'Region',
             'prefix' => 'Prefix',
+            'cent_status' => 'Статус центра',
+            'off_name' => 'Off name',
         ];
     }
 

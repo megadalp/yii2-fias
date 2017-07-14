@@ -104,7 +104,7 @@ $this->registerJs($js);
 
     <div class="form-group">
         <label for="form-region">Регион</label>
-        <?= Html::dropDownList('region', 77, $regions, ['class' => 'form-control', 'if' => 'form-region']) ?>
+        <?= Html::dropDownList('region', 77, $regions, ['class' => 'form-control', 'id' => 'form-region']) ?>
     </div>
 
     <div class="form-group">
