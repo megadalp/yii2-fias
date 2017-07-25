@@ -74,7 +74,7 @@ class Dearchiver
         $pathToFile = escapeshellarg($pathToFile);
         $directoryForExtract = escapeshellarg($directoryForExtract);
 
-        exec(Fias::$unrarCommand . ' e ' . $pathToFile . ' ' . $directoryForExtract . ' 2>&1', $output, $result);
+        exec(Fias::unrarCommand() . ' e ' . $pathToFile . ' ' . $directoryForExtract . ' 2>&1', $output, $result);
 
         if ($result !== 0) {
             throw new \Exception('Ошибка разархивации: ' . implode("\n", $output));

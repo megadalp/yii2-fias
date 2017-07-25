@@ -30,7 +30,8 @@ class Module extends \yii\base\Module
     private $directory;
     private static $directoryStatic;
 
-    static $unrarCommand = '/usr/local/bin/unrar';
+    public $unrarCommand = '/usr/local/bin/unrar';
+    static $unrarCommandStatic;
 
     /**
      * @inherit
@@ -89,6 +90,23 @@ class Module extends \yii\base\Module
     }
 
     /**
+     * @return mixed|\yii\db\Connection
+     */
+    public function getUnrarCommand()
+    {
+        return $this->unrarCommand;
+    }
+
+    /**
+     * @param string|\yii\db\Connection $value
+     */
+    public function setUnrarCommand($value)
+    {
+        $this->unrarCommand = $value;
+        self::$unrarCommandStatic = $this->unrarCommand;
+    }
+
+    /**
      * Для статических методов
      * @return mixed|\yii\db\Connection
      */
@@ -119,5 +137,21 @@ class Module extends \yii\base\Module
         }
 
         return self::$directoryStatic;
+    }
+    /**
+     * Для статических методов
+     * @return string
+     */
+    public static function unrarCommand()
+    {
+        if (empty(self::$unrarCommandStatic)) {
+            if (!empty(Yii::$app->getModule('fias')->unrarCommand)) {
+                self::$unrarCommandStatic = Yii::$app->getModule('fias')->unrarCommand;
+            } else {
+                self::$unrarCommandStatic = Yii::getAlias('@app/runtime/fias');
+            }
+        }
+
+        return self::$unrarCommandStatic;
     }
 }
