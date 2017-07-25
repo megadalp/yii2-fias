@@ -18,6 +18,7 @@ class Module extends \yii\base\Module
      * @var \yii\db\Connection
      */
     public $db;
+
     /** @var \yii\db\Connection */
     static $dbStatic;
 
@@ -28,6 +29,8 @@ class Module extends \yii\base\Module
      */
     private $directory;
     private static $directoryStatic;
+
+    static $unrarCommand = '/usr/local/bin/unrar';
 
     /**
      * @inherit
