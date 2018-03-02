@@ -149,6 +149,27 @@ class m160711_062538_fias_tables extends Migration
             ], $tableOptions
             );
 
+/** Изменение колонок, причина - ФИАС изменила свои данные. */
+# 1. У всех перечисленных убран NOT NULL
+# 2. Увеличена длина:
+#     area_code - 3
+#     auto_code - 3
+$this->execute( "
+    ALTER TABLE fias_address_object
+      MODIFY `cent_status` int(11) DEFAULT 0 COMMENT 'Статус центра (centstatus)',
+      MODIFY `region_code` char(2) DEFAULT '00' COMMENT 'Регион',
+      MODIFY `area_code` char(3) DEFAULT '000' COMMENT 'Код района',
+      MODIFY `auto_code` char(3) DEFAULT '000' COMMENT 'Код автономии',
+      MODIFY `city_code` char(3) DEFAULT '000' COMMENT 'Код города',
+      MODIFY `ctar_code` char(3) DEFAULT '000' COMMENT 'Код внутригородского района',
+      MODIFY `place_code` char(3) DEFAULT '000' COMMENT 'Код населённого пункта',
+      MODIFY `street_code` char(4) DEFAULT '0000' COMMENT 'Код улицы',
+      MODIFY `extr_code` char(4) DEFAULT '0000' COMMENT 'Код дополнительного адресообразующего элемента',
+      MODIFY `sext_code` char(3) DEFAULT '000' COMMENT 'Код подчиненного дополнительного адресообразующего элемента',
+      MODIFY `parent_id` char(36) DEFAULT NULL COMMENT 'Идентификационный код родительского адресного объекта'
+    ;
+" );
+
             $this->addPrimaryKey('pk', '{{%fias_address_object}}', 'address_id');
             $this->createIndex('address_object_address_id_fkey_idx', '{{%fias_address_object}}', 'address_id');
             $this->createIndex('address_object_parent_id_fkey_idx', '{{%fias_address_object}}', 'parent_id');
