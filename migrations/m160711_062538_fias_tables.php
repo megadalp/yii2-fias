@@ -157,7 +157,7 @@ class m160711_062538_fias_tables extends Migration
 $this->execute( "
     ALTER TABLE fias_address_object
       MODIFY `cent_status` int(11) DEFAULT 0 COMMENT 'Статус центра (centstatus)',
-      MODIFY `region_code` char(2) DEFAULT '00' COMMENT 'Регион',
+      MODIFY `region` char(2) DEFAULT '00' COMMENT 'Регион',
       MODIFY `area_code` char(3) DEFAULT '000' COMMENT 'Код района',
       MODIFY `auto_code` char(3) DEFAULT '000' COMMENT 'Код автономии',
       MODIFY `city_code` char(3) DEFAULT '000' COMMENT 'Код города',

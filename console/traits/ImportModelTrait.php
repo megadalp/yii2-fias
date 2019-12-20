@@ -53,7 +53,7 @@ trait ImportModelTrait
                 $rows = implode("\n", $rows);
                 static::saveInFile($pathToFile, $rows);
                 $count += Fias::db()
-                    ->createCommand("LOAD DATA LOCAL INFILE '{$pathToFile}' INTO TABLE {$tableName} CHARACTER SET UTF8 ({$values})")
+                    ->createCommand("LOAD DATA INFILE '{$pathToFile}' INTO TABLE {$tableName} CHARACTER SET UTF8 ({$values})")
                     ->execute();
                 Console::output(Yii::$app->formatter->asDateTime(time(), 'php:Y-m-d H:i:s').' '.  "Inserted {$count} rows");
             }
