@@ -74,7 +74,9 @@ class Dearchiver
         $pathToFile = escapeshellarg($pathToFile);
         $directoryForExtract = escapeshellarg($directoryForExtract);
 
-        exec(Fias::unrarCommand() . ' e ' . $pathToFile . ' ' . $directoryForExtract . ' 2>&1', $output, $result);
+        // exec(Fias::unrarCommand() . ' e ' . $pathToFile . ' ' . $directoryForExtract . ' 2>&1', $output, $result);
+        // FIXME: бессмысленно здесь использовать команду из настроек - ком.строка все равно совсем другая. Так что хардкод.
+        exec('unzip ' . $pathToFile . ' -d ' . $directoryForExtract . ' 2>&1', $output, $result);
 
         if ($result !== 0) {
             throw new \Exception('Ошибка разархивации: ' . implode("\n", $output));
